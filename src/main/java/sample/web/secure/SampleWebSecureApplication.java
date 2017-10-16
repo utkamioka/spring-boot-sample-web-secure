@@ -65,7 +65,8 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests()
+			http.csrf().disable()
+                    .authorizeRequests()
 					.anyRequest().fullyAuthenticated()
 					.and()
 					.formLogin()
