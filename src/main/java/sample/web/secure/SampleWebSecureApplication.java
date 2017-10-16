@@ -72,7 +72,10 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 					.formLogin()
 					.loginPage("/login").failureUrl("/login?error").permitAll()
 					.and()
-					.logout().permitAll();
+					.logout().permitAll()
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers("/swagger-ui.html").permitAll();
 		}
 
 		@Override

@@ -1,0 +1,1 @@
+http --auth foo:bar GET http://localhost:8080/health

@@ -17,6 +17,7 @@
     <h1 th:text="${title}">__title__</h1>
     <div th:text="${message}">__message__</div>
     <div id="created" th:text="${#dates.format(date)}">__date__</div>
+    <div th:text="${#authentication.name}">__username__</div>
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="Sign Out"/>
     </form>
