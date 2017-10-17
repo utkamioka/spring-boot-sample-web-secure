@@ -41,3 +41,7 @@ dependencies {
     compile 'io.springfox:springfox-swagger2:2.7.+'
     compile 'io.springfox:springfox-swagger-ui:2.7.+'
 }
+
+springBoot {
+    executable = true
+}

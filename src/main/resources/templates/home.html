@@ -1,8 +1,14 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <title th:text="${title}">Title</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>
+    <!--<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>-->
+    <link href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css"
+          rel="stylesheet"
+          integrity="sha384-G87n9a15LEsz+OvKCr10ldEbckfbCpr2gjYnZgCiKiwH0p/If1QkSURCTzubbt19"
+          crossorigin="anonymous"/>
 </head>
 <body>
 <div class="container">
@@ -18,6 +24,26 @@
     <div th:text="${message}">__message__</div>
     <div id="created" th:text="${#dates.format(date)}">__date__</div>
     <div th:text="${#authentication.name}">__username__</div>
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/pages/admin}">to admin page</a>
+    </div>
+    <div sec:authorize="hasRole('USER')">
+        <a th:href="@{/pages/user}">to user page</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"
+            integrity="sha384-2sVosMIQw67h8RBCTmE20BSl9j66nWwbH+2W/CKr8celILSNnEfJnJv2PKCdet3I"
+            crossorigin="anonymous"></script>
+    <script>
+        $.ajax('/pages/user')
+        .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})
+        .fail(function(jqXHR, textStatus, errorThrown){console.log(jqXHR, textStatus, errorThrown)});
+        $.ajax('/pages/admin')
+        .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})
+        .fail(function(jqXHR, textStatus, errorThrown){console.log(jqXHR, textStatus, errorThrown)});
+    </script>
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="Sign Out"/>
     </form>

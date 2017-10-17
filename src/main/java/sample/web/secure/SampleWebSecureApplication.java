@@ -22,10 +22,14 @@ import java.util.Map;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,53 +41,68 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Controller
 public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 
-	@GetMapping("/")
-	public String home(Map<String, Object> model) {
-		model.put("message", "Hello World");
-		model.put("title", "Hello Home");
-		model.put("date", new Date());
-		return "home";
-	}
+    @GetMapping(value = {"/", "/home"})
+    public String home(Map<String, Object> model) {
+        model.put("message", "Hello World");
+        model.put("title", "Hello Home");
+        model.put("date", new Date());
+        return "home";
+    }
 
-	@RequestMapping("/foo")
-	public String foo() {
-		throw new RuntimeException("Expected exception in controller");
-	}
+    @RequestMapping("/foo")
+    public String foo() {
+        throw new RuntimeException("Expected exception in controller");
+    }
 
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/login").setViewName("login");
-	}
+//    // XXX: #configure(HttpSecurity)で、loginPage()を指定しない場合（Spring-bootのデフォルトログインページを使う場合）は不要
+//    @Override
+//    public void addViewControllers(ViewControllerRegistry registry) {
+//        registry.addViewController("/login").setViewName("login");
+//    }
 
-	public static void main(String[] args) throws Exception {
-		new SpringApplicationBuilder(SampleWebSecureApplication.class).run(args);
-	}
+    public static void main(String[] args) throws Exception {
+        new SpringApplicationBuilder(SampleWebSecureApplication.class).run(args);
+    }
 
-	@Configuration
-	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-	protected static class ApplicationSecurity extends WebSecurityConfigurerAdapter {
+    @Configuration
+    // ACCESS_OVERRIDE_ORDERは(BASIC_AUTH_ORDER-2)なので、BASIC認証より先に処理される
+    @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+    protected static class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable()
-                    // swaggerのページは認証外とする
-                    .authorizeRequests().antMatchers("/v2/api-docs", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**").permitAll()
-                    .and()
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            // swaggerのページは認証外とする
+            web.ignoring().mvcMatchers("/v2/api-docs", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**");
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            // CSRFをdisableにしないと、 POST /logoutが上手くいかない（対策不明）
+            http.csrf().disable()
                     .authorizeRequests()
-					.anyRequest().fullyAuthenticated()
-					.and()
-					.formLogin()
-					.loginPage("/login").failureUrl("/login?error").permitAll()
-					.and()
-					.logout().permitAll();
-		}
+                    .anyRequest().fullyAuthenticated()
+                    .and()
+                    .formLogin();
+//                    // XXX: loginPage()を指定しなければ、Spring-bootのデフォルトログインページになる
+//                    .loginPage("/login").failureUrl("/login?error").permitAll()
+//                    .and()
+//                    .logout().permitAll();
+        }
 
-		@Override
-		public void configure(AuthenticationManagerBuilder auth) throws Exception {
-			auth.inMemoryAuthentication()
-					.withUser("admin").password("admin").roles("ADMIN", "USER")
-					.and()
-					.withUser("user").password("user").roles("USER");
-		}
-	}
+        @Override
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.inMemoryAuthentication()
+                    .withUser("admin").password("admin").roles("ADMIN", "USER")
+                    .and()
+                    .withUser("user").password("user").roles("USER");
+        }
+
+        // XXX: #configure(AuthenticationManagerBuilder)で作成されるAuthenticationManagerが取得できるか？
+        @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+        @Override
+        protected AuthenticationManager authenticationManager() throws Exception {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ApplicationSecurity.authenticationManager()");
+            return super.authenticationManager();
+        }
+    }
 }
