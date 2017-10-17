@@ -1,1 +1,2 @@
 http --auth foo:bar GET http://localhost:8080/health
+http GET http://localhost:8080/swagger-ui.html

@@ -66,16 +66,16 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http.csrf().disable()
+                    // swaggerのページは認証外とする
+                    .authorizeRequests().antMatchers("/v2/api-docs", "/swagger-ui.html", "/webjars/**", "/swagger-resources/**").permitAll()
+                    .and()
                     .authorizeRequests()
 					.anyRequest().fullyAuthenticated()
 					.and()
 					.formLogin()
 					.loginPage("/login").failureUrl("/login?error").permitAll()
 					.and()
-					.logout().permitAll()
-                    .and()
-                    .authorizeRequests()
-                    .antMatchers("/swagger-ui.html").permitAll();
+					.logout().permitAll();
 		}
 
 		@Override
