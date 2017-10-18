@@ -2,7 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Error</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"
+          href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"/>
 </head>
 <body>
 <div class="container">
@@ -21,7 +23,7 @@
         2012 2:17:16 PM CDT
     </div>
     <div>
-        <h1>403</h1>
+        <h1 style="color: red">403</h1>
         <p>see src/main/resources/templates/error/403.html</p>
     </div>
     <div>

@@ -34,7 +34,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @SpringBootApplication
@@ -56,7 +55,7 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 
 //    // XXX: #configure(HttpSecurity)で、loginPage()を指定しない場合（Spring-bootのデフォルトログインページを使う場合）は不要
 //    @Override
-//    public void addViewControllers(ViewControllerRegistry registry) {
+//    public void addViewControllers(org.springframework.web.servlet.config.annotation.ViewControllerRegistry registry) {
 //        registry.addViewController("/login").setViewName("login");
 //    }
 

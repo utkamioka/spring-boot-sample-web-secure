@@ -5,10 +5,15 @@
 <head>
     <title th:text="${title}">Title</title>
     <!--<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>-->
+<!--
     <link href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css"
           rel="stylesheet"
           integrity="sha384-G87n9a15LEsz+OvKCr10ldEbckfbCpr2gjYnZgCiKiwH0p/If1QkSURCTzubbt19"
           crossorigin="anonymous"/>
+-->
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"
+          href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"/>
 </head>
 <body>
 <div class="container">
@@ -30,12 +35,18 @@
     <div sec:authorize="hasRole('USER')">
         <a th:href="@{/pages/user}">to user page</a>
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"
-            integrity="sha384-2sVosMIQw67h8RBCTmE20BSl9j66nWwbH+2W/CKr8celILSNnEfJnJv2PKCdet3I"
-            crossorigin="anonymous"></script>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"
+            src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"
+            src="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <!--
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+                integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.0.4/js/bootstrap.min.js"
+                integrity="sha384-2sVosMIQw67h8RBCTmE20BSl9j66nWwbH+2W/CKr8celILSNnEfJnJv2PKCdet3I"
+                crossorigin="anonymous"></script>
+    -->
     <script>
         $.ajax('/pages/user')
         .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})

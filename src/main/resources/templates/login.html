@@ -1,8 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Login</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>
+    <!--<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" href="../../css/bootstrap.min.css"/>-->
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"
+          href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"/>
 </head>
 <body onload="document.form.username.focus();">
 <div class="container">
@@ -26,6 +29,11 @@
             <input type="submit" id="login" value="Login"
                    class="btn btn-primary"/>
         </form>
+        <!-- webjarsの確認用 -->
+        <script th:src="@{/webjars/jquery/jquery.min.js}"
+                src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
+        <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"
+                src="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     </div>
 </div>
 </body>
