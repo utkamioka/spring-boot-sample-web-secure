@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class LoggingFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -24,17 +24,15 @@ public class LoggingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest)request;
+        HttpServletResponse resp = (HttpServletResponse)response;
         System.out.println(">>> " + req.getMethod() + " " + req.getRequestURI());
         if (!isIgnore(req.getRequestURI())) {
             for (String n : Collections.list(req.getHeaderNames())) {
-                System.out.println("\t| " + n + " = " + req.getHeader(n));
+                System.out.println("\t> " + n + " = " + req.getHeader(n));
             }
-//        try (BufferedReader r = new BufferedReader(new InputStreamReader(req.getInputStream()))) {
-//            String line;
-//            while ((line = r.readLine()) != null) {
-//                System.out.println("\t> " + line);
-//            }
-//        }
+            for (String n : resp.getHeaderNames()) {
+                System.out.println("\t< " + n + " = " + resp.getHeader(n));
+            }
         }
 
         chain.doFilter(request, response);
