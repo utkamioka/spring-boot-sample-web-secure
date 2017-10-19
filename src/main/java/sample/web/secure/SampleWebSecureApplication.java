@@ -93,7 +93,9 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
             auth.inMemoryAuthentication()
                     .withUser("admin").password("admin").roles("ADMIN", "USER")
                     .and()
-                    .withUser("user").password("user").roles("USER");
+                    .withUser("user").password("user").roles("USER")
+                    .and()
+                    .withUser("guest").password("guest").roles();
         }
 
         // XXX: #configure(AuthenticationManagerBuilder)で作成されるAuthenticationManagerが取得できるか？
