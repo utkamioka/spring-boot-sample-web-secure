@@ -59,6 +59,14 @@
         .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})
         .fail(function(jqXHR, textStatus, errorThrown){console.log(jqXHR, textStatus, errorThrown)});
     </script>
+    <script>
+        $.ajax({url: '/api/books', type: 'GET'})
+        .done(function(data, textStatus, jqXHR){console.log("GET /api/books", data)})
+        .fail(function(jqXHR, textStatus, errorThrown){console.log("GET /api/books", jqXHR)});
+        $.ajax({url: '/api/books', type: 'POST'})
+        .done(function(data, textStatus, jqXHR){console.log("POST /api/books", data)})
+        .fail(function(jqXHR, textStatus, errorThrown){console.log("POST /api/books", jqXHR)});
+    </script>
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="Sign Out"/>
     </form>
