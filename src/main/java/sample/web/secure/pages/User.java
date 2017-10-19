@@ -1,9 +1,7 @@
 package sample.web.secure.pages;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,14 +17,9 @@ import java.util.stream.Collectors;
 @Secured({"ROLE_ADMIN", "ROLE_USER"})
 @RestController
 public class User {
-    // test
-    @Autowired
-    AuthenticationManager authenticationManager;
-
     @RequestMapping(path = "/pages/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String,Object> get(@AuthenticationPrincipal UserDetails userDetails) {
+    public Map<String, Object> get(@AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("getAuthorities() = " + userDetails.getAuthorities());
-        System.out.println("AuthenticationManager = " + authenticationManager + " / " + authenticationManager.getClass());
         Map<String, Object> response = new HashMap<>();
         response.put("username", userDetails.getUsername());
         response.put("password", userDetails.getPassword());

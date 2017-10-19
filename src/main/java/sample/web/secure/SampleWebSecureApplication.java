@@ -98,12 +98,13 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
                     .withUser("guest").password("guest").roles();
         }
 
-        // XXX: #configure(AuthenticationManagerBuilder)で作成されるAuthenticationManagerが取得できるか？
-        @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-        @Override
-        protected AuthenticationManager authenticationManager() throws Exception {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ApplicationSecurity.authenticationManager()");
-            return super.authenticationManager();
-        }
+//        // XXX: #configure(AuthenticationManagerBuilder)で作成されるAuthenticationManagerが取得できるか？
+//        // XXX: これがあると、spring-actuatorのBASIC認証が出来なくなる（対策不明）
+//        @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+//        @Override
+//        protected AuthenticationManager authenticationManager() throws Exception {
+//            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ApplicationSecurity.authenticationManager()");
+//            return super.authenticationManager();
+//        }
     }
 }

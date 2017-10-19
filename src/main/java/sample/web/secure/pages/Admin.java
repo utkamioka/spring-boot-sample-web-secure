@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,18 +23,22 @@ import java.util.stream.Collectors;
 @Secured("ROLE_ADMIN")
 @RestController
 public class Admin {
-    // test
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @ApiResponses(value={
+    @ApiResponses(value = {
             @ApiResponse(code = 200, message = "固定文字列を返します。"),
             @ApiResponse(code = 403, message = "権限がありません。")
     })
     @RequestMapping(path = "/pages/admin", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String,Object> get(@AuthenticationPrincipal UserDetails userDetails) {
+    public Map<String, Object> get(@AuthenticationPrincipal UserDetails userDetails) {
         System.out.println("getAuthorities() = " + userDetails.getAuthorities());
-        System.out.println("AuthenticationManager = " + authenticationManager + " / " + authenticationManager.getClass());
+        System.out.println("AuthenticationManager = " + authenticationManager);
+        if (authenticationManager != null) {
+            for (AuthenticationProvider p : ((ProviderManager) authenticationManager).getProviders()) {
+                System.out.println("\tAuthenticationProvider = " + p);
+            }
+        }
         Map<String, Object> response = new HashMap<>();
         response.put("username", userDetails.getUsername());
         response.put("password", userDetails.getPassword());
