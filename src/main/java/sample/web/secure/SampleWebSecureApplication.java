@@ -19,22 +19,28 @@ package sample.web.secure;
 import java.util.Date;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @SpringBootApplication
 @Controller
@@ -88,8 +94,47 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
 //                    .logout().permitAll();
         }
 
+        private @Autowired
+        HttpServletRequest request;
+        private @Autowired
+        HttpServletResponse response;
+
         @Override
         public void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.authenticationEventPublisher(new AuthenticationEventPublisher() {
+                @Override
+                public void publishAuthenticationSuccess(Authentication authentication) {
+                    System.out.println("ApplicationSecurity.publishAuthenticationSuccess()");
+                    System.out.println("authentication = " + authentication);
+                    System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
+                    System.out.println("authentication.getCredentials() = " + authentication.getCredentials());
+                    System.out.println("authentication.getAuthorities() = " + authentication.getAuthorities());
+
+                    System.out.println("request = " + request);
+                    System.out.println("response = " + response);
+
+                    HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+                    System.out.println("request = " + req);
+                    HttpServletResponse resp = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+                    System.out.println("response = " + resp);
+
+                    System.out.println(RequestIdFilter.HTTP_HEADER_REQUEST_ID + " = " + response.getHeader(RequestIdFilter.HTTP_HEADER_REQUEST_ID));
+                    System.out.println(RequestIdFilter.HTTP_HEADER_REQUEST_ID + " = " + resp.getHeader(RequestIdFilter.HTTP_HEADER_REQUEST_ID));
+                }
+
+                @Override
+                public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
+                    System.out.println("ApplicationSecurity.publishAuthenticationFailure()");
+                    System.out.println("exception = " + exception);
+                    System.out.println("authentication = " + authentication);
+                    System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
+                    System.out.println("authentication.getCredentials() = " + authentication.getCredentials());
+                    System.out.println("authentication.getAuthorities() = " + authentication.getAuthorities());
+                    System.out.println("request = " + request);
+                    System.out.println("response = " + response);
+                    System.out.println(RequestIdFilter.HTTP_HEADER_REQUEST_ID + " = " + response.getHeader(RequestIdFilter.HTTP_HEADER_REQUEST_ID));
+                }
+            });
             auth.inMemoryAuthentication()
                     .withUser("admin").password("admin").roles("ADMIN", "USER")
                     .and()
@@ -97,14 +142,5 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
                     .and()
                     .withUser("guest").password("guest").roles();
         }
-
-//        // XXX: #configure(AuthenticationManagerBuilder)で作成されるAuthenticationManagerが取得できるか？
-//        // XXX: これがあると、spring-actuatorのBASIC認証が出来なくなる（対策不明）
-//        @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-//        @Override
-//        protected AuthenticationManager authenticationManager() throws Exception {
-//            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ApplicationSecurity.authenticationManager()");
-//            return super.authenticationManager();
-//        }
     }
 }
