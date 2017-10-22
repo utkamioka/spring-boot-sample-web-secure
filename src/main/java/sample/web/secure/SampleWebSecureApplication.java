@@ -120,12 +120,17 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
         @Override
         public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FilterBefore3.doFilter()");
-            List<GrantedAuthority> authorities = Arrays.asList(
-                    new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_USER"),
-                    new SimpleGrantedAuthority("ROLE_XXX")
-            );
-            Authentication a = new UsernamePasswordAuthenticationToken("admin", null, authorities);
+            HttpServletRequest req = (HttpServletRequest)request;
+            System.out.println(req.getParameter("user"));
+            System.out.println(req.getParameter("pass"));
+
+            List<GrantedAuthority> authorities = new ArrayList<>();
+//            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+//            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+//            authorities.add(new SimpleGrantedAuthority("ROLE_XXX"));
+
+            Authentication a = new UsernamePasswordAuthenticationToken(req.getParameter("user"), null, authorities);
+            System.out.println(a);
             SecurityContextHolder.getContext().setAuthentication(a);
             chain.doFilter(request, response);
         }
