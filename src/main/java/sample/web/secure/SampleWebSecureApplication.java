@@ -16,8 +16,8 @@
 
 package sample.web.secure;
 
-import java.util.Date;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,19 +26,34 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -69,6 +84,61 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
         new SpringApplicationBuilder(SampleWebSecureApplication.class).run(args);
     }
 
+    public static class FilterBefore1 extends GenericFilterBean {
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FilterBefore1.doFilter()");
+            chain.doFilter(request, response);
+        }
+    }
+
+    public static class FilterBefore2 extends AbstractAuthenticationProcessingFilter {
+        protected FilterBefore2(RequestMatcher requiresAuthenticationRequestMatcher, AuthenticationManager am) {
+            super(requiresAuthenticationRequestMatcher);
+            setAuthenticationManager(am);
+        }
+        @Override
+        public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FilterBefore2.attemptAuthentication()");
+            return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken("admin", "admin"));
+        }
+        @Override
+        protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>> FilterBefore2.successfulAuthentication()");
+            System.out.println("authResult = " + authResult);
+            super.successfulAuthentication(request, response, chain, authResult);
+        }
+        @Override
+        protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>> FilterBefore2.unsuccessfulAuthentication()");
+            System.out.println("failed = " + failed);
+            super.unsuccessfulAuthentication(request, response, failed);
+        }
+    }
+
+    public static class FilterBefore3 extends GenericFilterBean {
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FilterBefore3.doFilter()");
+            List<GrantedAuthority> authorities = Arrays.asList(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_USER"),
+                    new SimpleGrantedAuthority("ROLE_XXX")
+            );
+            Authentication a = new UsernamePasswordAuthenticationToken("admin", null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(a);
+            chain.doFilter(request, response);
+        }
+    }
+
+    public static class FilterAfter1 extends GenericFilterBean {
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> FilterAfter1.doFilter()");
+            chain.doFilter(request, response);
+        }
+    }
+
     @Configuration
     // ACCESS_OVERRIDE_ORDERは(BASIC_AUTH_ORDER-2)なので、BASIC認証より先に処理される
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
@@ -87,7 +157,12 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
                     .authorizeRequests()
                     .anyRequest().fullyAuthenticated()
                     .and()
-                    .formLogin();
+                    .formLogin()
+                    .and()
+                    .addFilterBefore(new FilterBefore1(), UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(new FilterBefore2(new AntPathRequestMatcher("/force-login"), authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(new FilterBefore3(), UsernamePasswordAuthenticationFilter.class)
+                    .addFilterAfter(new FilterAfter1(), UsernamePasswordAuthenticationFilter.class);
 //                    // XXX: loginPage()を指定しなければ、Spring-bootのデフォルトログインページになる
 //                    .loginPage("/login").failureUrl("/login?error").permitAll()
 //                    .and()
