@@ -165,8 +165,8 @@ public class SampleWebSecureApplication extends WebMvcConfigurerAdapter {
                     .formLogin()
                     .and()
                     .addFilterBefore(new FilterBefore1(), UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(new FilterBefore2(new AntPathRequestMatcher("/force-login"), authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-                    .addFilterBefore(new FilterBefore3(), UsernamePasswordAuthenticationFilter.class)
+//                    .addFilterBefore(new FilterBefore2(new AntPathRequestMatcher("/force-login"), authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+//                    .addFilterBefore(new FilterBefore3(), UsernamePasswordAuthenticationFilter.class)
                     .addFilterAfter(new FilterAfter1(), UsernamePasswordAuthenticationFilter.class);
 //                    // XXX: loginPage()を指定しなければ、Spring-bootのデフォルトログインページになる
 //                    .loginPage("/login").failureUrl("/login?error").permitAll()

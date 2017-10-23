@@ -48,6 +48,7 @@
                 integrity="sha384-2sVosMIQw67h8RBCTmE20BSl9j66nWwbH+2W/CKr8celILSNnEfJnJv2PKCdet3I"
                 crossorigin="anonymous"></script>
     -->
+<!--
     <script>
         $.ajax('/pages/admin')
         .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})
@@ -59,6 +60,8 @@
         .done(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR)})
         .fail(function(jqXHR, textStatus, errorThrown){console.log(jqXHR, textStatus, errorThrown)});
     </script>
+-->
+<!--
     <script>
         $.ajax({url: '/api/books', type: 'GET'})
         .done(function(data, textStatus, jqXHR){console.log("GET /api/books", data)})
@@ -67,6 +70,7 @@
         .done(function(data, textStatus, jqXHR){console.log("POST /api/books", data)})
         .fail(function(jqXHR, textStatus, errorThrown){console.log("POST /api/books", jqXHR)});
     </script>
+-->
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="Sign Out"/>
     </form>
